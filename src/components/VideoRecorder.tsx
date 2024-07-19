@@ -1,12 +1,12 @@
 import { useReactMediaRecorder } from "react-media-recorder";
 import VideoStreamPreview from "./VideoStreamPreview";
-// import { useState } from "react";
+import { useState } from "react";
 
 const VideoRecorder = () => {
-  // const [isRecording, setIsRecording] = useState<boolean>(false);
-  // const [isStop, setIsStop] = useState<boolean>(false);
-  // const [isPause, setIsPause] = useState<boolean>(false);
-  // const [timer, setTimer] = useState<TimeRanges>();
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [isStop, setIsStop] = useState<boolean>(false);
+  const [isPause, setIsPause] = useState<boolean>(false);
+  const [timer, setTimer] = useState<TimeRanges>();
 
   const {
     status,
@@ -16,6 +16,29 @@ const VideoRecorder = () => {
     previewStream,
     pauseRecording,
   } = useReactMediaRecorder({ video: true, askPermissionOnMount: true });
+
+  const handleStartBtnClick = () => {
+    setIsRecording(true);
+    setIsPause(false);
+    setIsStop(false);
+
+    startRecording();
+  };
+
+  const handleStopBtnClick = () => {
+    setIsStop(true);
+    setIsRecording(false);
+    setIsPause(false);
+
+    stopRecording();
+  };
+
+  const handlePauseBtnClick = () => {
+    setIsPause(true);
+    setIsStop(false);
+
+    isPause ? startRecording() : pauseRecording();
+  };
 
   return (
     <div className="container border p-3">
@@ -29,32 +52,38 @@ const VideoRecorder = () => {
           </p>
         </div>
         <div className="col-5 d-flex align-items-center justify-content-end gap-3">
-          <button
-            className="btn btn-primary btn-sm fw-bold"
-            type="button"
-            onClick={startRecording}
-          >
-            Start Recording
-          </button>
-          <button
-            className="btn btn-secondary btn-sm fw-bold"
-            type="button"
-            onClick={pauseRecording}
-          >
-            Pause Recording
-          </button>
-          <button
-            className="btn btn-danger btn-sm fw-bold"
-            type="button"
-            onClick={stopRecording}
-          >
-            Stop Recording
-          </button>
+          {!isRecording && (
+            <button
+              className="btn btn-primary btn-sm fw-bold"
+              type="button"
+              onClick={handleStartBtnClick}
+            >
+              Start Recording
+            </button>
+          )}
+          {isRecording && (
+            <button
+              className="btn btn-secondary btn-sm fw-bold"
+              type="button"
+              onClick={handlePauseBtnClick}
+            >
+              {isPause ? "Continue" : "Pause"} Recording
+            </button>
+          )}
+          {isRecording && (
+            <button
+              className="btn btn-danger btn-sm fw-bold"
+              type="button"
+              onClick={handleStopBtnClick}
+            >
+              Stop Recording
+            </button>
+          )}
         </div>
       </div>
       <div className="row mt-3">
         <div className="col-12 d-flex align-items-center justify-content-center">
-          {mediaBlobUrl && (
+          {isStop && (
             <video
               src={mediaBlobUrl}
               width={"100%"}
@@ -63,9 +92,11 @@ const VideoRecorder = () => {
               autoPlay
             />
           )}
-          {previewStream && <VideoStreamPreview stream={previewStream} />}
+          {previewStream && isRecording && (
+            <VideoStreamPreview stream={previewStream} />
+          )}
 
-          {!previewStream && !mediaBlobUrl && (
+          {!isRecording && !mediaBlobUrl && (
             <div
               className="d-flex align-items-center justify-content-center"
               style={{ height: "50%", width: "100%", background: "#ccc" }}
