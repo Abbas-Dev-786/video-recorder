@@ -1,44 +1,22 @@
 import { useReactMediaRecorder } from "react-media-recorder";
 import VideoStreamPreview from "./VideoStreamPreview";
-import { useState } from "react";
+import useVideoRecorder from "../hooks/useVideoRecorder";
 
 const VideoRecorder = () => {
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [isStop, setIsStop] = useState<boolean>(false);
-  const [isPause, setIsPause] = useState<boolean>(false);
-  const [timer, setTimer] = useState<TimeRanges>();
-
   const {
-    status,
-    startRecording,
-    stopRecording,
-    mediaBlobUrl,
-    previewStream,
-    pauseRecording,
-  } = useReactMediaRecorder({ video: true, askPermissionOnMount: true });
+    startVideoRecording,
+    endVideoRecording,
+    pauseVideoRecording,
+    isPause,
+    isRecording,
+    isStop,
+    getTime,
+  } = useVideoRecorder();
 
-  const handleStartBtnClick = () => {
-    setIsRecording(true);
-    setIsPause(false);
-    setIsStop(false);
-
-    startRecording();
-  };
-
-  const handleStopBtnClick = () => {
-    setIsStop(true);
-    setIsRecording(false);
-    setIsPause(false);
-
-    stopRecording();
-  };
-
-  const handlePauseBtnClick = () => {
-    setIsPause(true);
-    setIsStop(false);
-
-    isPause ? startRecording() : pauseRecording();
-  };
+  const { status, mediaBlobUrl, previewStream } = useReactMediaRecorder({
+    video: true,
+    askPermissionOnMount: true,
+  });
 
   return (
     <div className="container border p-3">
@@ -48,7 +26,7 @@ const VideoRecorder = () => {
         </div>
         <div className="col-3">
           <p className="text-capitalize fw-bolder text-center">
-            Timer:- 00:00:00
+            Timer:- {getTime()}
           </p>
         </div>
         <div className="col-5 d-flex align-items-center justify-content-end gap-3">
@@ -56,7 +34,7 @@ const VideoRecorder = () => {
             <button
               className="btn btn-primary btn-sm fw-bold"
               type="button"
-              onClick={handleStartBtnClick}
+              onClick={() => startVideoRecording()}
             >
               Start Recording
             </button>
@@ -65,7 +43,7 @@ const VideoRecorder = () => {
             <button
               className="btn btn-secondary btn-sm fw-bold"
               type="button"
-              onClick={handlePauseBtnClick}
+              onClick={() => pauseVideoRecording()}
             >
               {isPause ? "Continue" : "Pause"} Recording
             </button>
@@ -74,7 +52,7 @@ const VideoRecorder = () => {
             <button
               className="btn btn-danger btn-sm fw-bold"
               type="button"
-              onClick={handleStopBtnClick}
+              onClick={() => endVideoRecording()}
             >
               Stop Recording
             </button>
