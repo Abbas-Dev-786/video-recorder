@@ -1,36 +1,24 @@
-import { useEffect, useState } from "react";
-import { useReactMediaRecorder } from "react-media-recorder";
+import moment from "moment";
+import { useState } from "react";
 
-const useVideoRecorder = () => {
+const useVideoRecorder = ({
+  startRecording,
+  stopRecording,
+  pauseRecording,
+}: any) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isStop, setIsStop] = useState<boolean>(false);
   const [isPause, setIsPause] = useState<boolean>(false);
-  const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const [timer, setTimerId] = useState<number | null>(null);
-
-  const { startRecording, stopRecording, pauseRecording } =
-    useReactMediaRecorder({ video: true, askPermissionOnMount: true });
 
   const startVideoRecording = () => {
     setIsRecording(true);
     setIsPause(false);
     setIsStop(false);
 
-    startRecording();
+    const startTime = new Date();
+    sessionStorage.setItem("startTime", startTime.toISOString());
 
-    if (!isPause) {
-      const startTime = Date.now() - elapsedTime;
-      const id: any = setInterval(() => {
-        setElapsedTime(Date.now() - startTime);
-      }, 1000);
-      setTimerId(id);
-    } else if (isPause) {
-      const startTime = Date.now() - elapsedTime;
-      const id: any = setInterval(() => {
-        setElapsedTime(Date.now() - startTime);
-      }, 1000);
-      setTimerId(id);
-    }
+    startRecording();
   };
 
   const endVideoRecording = () => {
@@ -39,11 +27,6 @@ const useVideoRecorder = () => {
     setIsPause(false);
 
     stopRecording();
-
-    if (isStop && timer) {
-      clearInterval(timer);
-      setTimerId(null);
-    }
   };
 
   const pauseVideoRecording = () => {
@@ -51,32 +34,26 @@ const useVideoRecorder = () => {
     setIsStop(false);
 
     isPause ? startRecording() : pauseRecording();
-
-    if (isPause && timer) {
-      clearInterval(timer);
-      setTimerId(null);
-    }
   };
 
   const getTime = () => {
-    const totalSeconds = Math.floor(elapsedTime / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const startTime = moment(
+      new Date(sessionStorage.getItem("startTime") || "")
+    ).format("YYYY-MM-DDTHH:mm:ss");
+    const current = moment();
 
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-      2,
-      "0"
-    )}:${String(seconds).padStart(2, "0")}`;
+    const hours = current.diff(startTime, "hours") % 12;
+    const mins = current.diff(startTime, "minutes") % 60;
+    const secs = current.diff(startTime, "seconds") % 60;
+
+    return [
+      `${String(hours).padStart(2, "0")}:${String(mins).padStart(
+        2,
+        "0"
+      )}:${String(secs).padStart(2, "0")}`,
+      mins,
+    ];
   };
-
-  useEffect(() => {
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [timer]);
 
   return {
     isRecording,

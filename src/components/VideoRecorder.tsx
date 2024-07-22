@@ -1,8 +1,23 @@
 import { useReactMediaRecorder } from "react-media-recorder";
 import VideoStreamPreview from "./VideoStreamPreview";
 import useVideoRecorder from "../hooks/useVideoRecorder";
+import { useEffect, useRef } from "react";
 
 const VideoRecorder = () => {
+  const timerRef = useRef<HTMLParagraphElement | null>(null);
+
+  const {
+    status,
+    mediaBlobUrl,
+    previewStream,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+  } = useReactMediaRecorder({
+    video: true,
+    askPermissionOnMount: true,
+  });
+
   const {
     startVideoRecording,
     endVideoRecording,
@@ -11,12 +26,26 @@ const VideoRecorder = () => {
     isRecording,
     isStop,
     getTime,
-  } = useVideoRecorder();
+  } = useVideoRecorder({ startRecording, stopRecording, pauseRecording });
 
-  const { status, mediaBlobUrl, previewStream } = useReactMediaRecorder({
-    video: true,
-    askPermissionOnMount: true,
-  });
+  useEffect(() => {
+    let interval: number;
+
+    if (isRecording && timerRef?.current) {
+      interval = setInterval(() => {
+        const [time, mins] = getTime();
+        (timerRef.current as HTMLElement).textContent = `Timer:- ${time}`;
+
+        if (mins == 1) {
+          sessionStorage.removeItem("startTime");
+          clearInterval(interval);
+          stopRecording();
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval); // Clean up on component unmount
+  }, [timerRef, isRecording]);
 
   return (
     <div className="container border p-3">
@@ -25,9 +54,10 @@ const VideoRecorder = () => {
           <p className="text-capitalize fw-bolder">Status:- {status}</p>
         </div>
         <div className="col-3">
-          <p className="text-capitalize fw-bolder text-center">
-            Timer:- {getTime()}
-          </p>
+          <p
+            className="text-capitalize fw-bolder text-center"
+            ref={timerRef}
+          ></p>
         </div>
         <div className="col-5 d-flex align-items-center justify-content-end gap-3">
           {!isRecording && (
