@@ -15,10 +15,10 @@ const useVideoRecorder = ({
     setIsPause(false);
     setIsStop(false);
 
+    startRecording();
+
     const startTime = new Date();
     sessionStorage.setItem("startTime", startTime.toISOString());
-
-    startRecording();
   };
 
   const endVideoRecording = () => {
@@ -51,7 +51,7 @@ const useVideoRecorder = ({
         2,
         "0"
       )}:${String(secs).padStart(2, "0")}`,
-      mins,
+      secs,
     ];
   };
 

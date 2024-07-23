@@ -33,13 +33,13 @@ const VideoRecorder = () => {
 
     if (isRecording && timerRef?.current) {
       interval = setInterval(() => {
-        const [time, mins] = getTime();
+        const [time, secs] = getTime();
         (timerRef.current as HTMLElement).textContent = `Timer:- ${time}`;
 
-        if (mins == 1) {
+        if (secs == 30) {
+          endVideoRecording();
           sessionStorage.removeItem("startTime");
           clearInterval(interval);
-          stopRecording();
         }
       }, 1000);
     }
@@ -69,7 +69,7 @@ const VideoRecorder = () => {
               Start Recording
             </button>
           )}
-          {isRecording && (
+          {/* {isRecording && (
             <button
               className="btn btn-secondary btn-sm fw-bold"
               type="button"
@@ -86,7 +86,7 @@ const VideoRecorder = () => {
             >
               Stop Recording
             </button>
-          )}
+          )} */}
         </div>
       </div>
       <div className="row mt-3">
