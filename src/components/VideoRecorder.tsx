@@ -21,8 +21,6 @@ const VideoRecorder = () => {
   const {
     startVideoRecording,
     endVideoRecording,
-    pauseVideoRecording,
-    isPause,
     isRecording,
     isStop,
     getTime,
