@@ -24,7 +24,11 @@ const VideoRecorder = () => {
     isRecording,
     isStop,
     getTime,
-  } = useVideoRecorder({ startRecording, stopRecording, pauseRecording });
+  } = useVideoRecorder({
+    startRecording,
+    stopRecording,
+    pauseRecording,
+  });
 
   useEffect(() => {
     let interval: number;
