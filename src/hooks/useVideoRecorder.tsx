@@ -1,7 +1,5 @@
 import moment from "moment";
-import { useContext, useEffect, useState } from "react";
-import useFullscreen from "./useFullscreen";
-import { MyContext } from "../store/GlobalContext";
+import { useState } from "react";
 
 const useVideoRecorder = ({
   startRecording,
@@ -12,19 +10,7 @@ const useVideoRecorder = ({
   const [isStop, setIsStop] = useState<boolean>(false);
   const [isPause, setIsPause] = useState<boolean>(false);
 
-  const { enterFullscreen, exitFullscreen, isFullscreen } = useFullscreen();
-  const { containerRef } = useContext(MyContext);
-
-  useEffect(() => {
-    if (isRecording && !isFullscreen) {
-      endVideoRecording();
-    }
-  }, [isFullscreen]);
-
   const startVideoRecording = () => {
-    if (!containerRef?.current) return;
-
-    enterFullscreen();
     setIsRecording(true);
     setIsPause(false);
     setIsStop(false);
@@ -41,7 +27,6 @@ const useVideoRecorder = ({
     setIsPause(false);
 
     stopRecording();
-    exitFullscreen();
   };
 
   const pauseVideoRecording = () => {
