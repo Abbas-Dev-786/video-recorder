@@ -1,34 +1,20 @@
-import { useReactMediaRecorder } from "react-media-recorder";
 import VideoStreamPreview from "./VideoStreamPreview";
-import useVideoRecorder from "../hooks/useVideoRecorder";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
+import { MyContext } from "../store/GlobalContext";
 
 const VideoRecorder = () => {
   const timerRef = useRef<HTMLParagraphElement | null>(null);
 
   const {
-    status,
-    mediaBlobUrl,
+    screenStatus,
+    screenBlobUrl,
     previewStream,
-    startRecording,
-    stopRecording,
-    pauseRecording,
-  } = useReactMediaRecorder({
-    video: true,
-    askPermissionOnMount: true,
-  });
-
-  const {
-    startVideoRecording,
-    endVideoRecording,
+    startInterview,
+    endInterview,
     isRecording,
     isStop,
     getTime,
-  } = useVideoRecorder({
-    startRecording,
-    stopRecording,
-    pauseRecording,
-  });
+  } = useContext(MyContext);
 
   useEffect(() => {
     let interval: number;
@@ -39,7 +25,7 @@ const VideoRecorder = () => {
         (timerRef.current as HTMLElement).textContent = `Timer:- ${time}`;
 
         if (secs == 30) {
-          endVideoRecording();
+          endInterview();
           sessionStorage.removeItem("startTime");
           clearInterval(interval);
         }
@@ -53,7 +39,7 @@ const VideoRecorder = () => {
     <div className="container border p-3">
       <div className="row">
         <div className="col-4">
-          <p className="text-capitalize fw-bolder">Status:- {status}</p>
+          <p className="text-capitalize fw-bolder">Status:- {screenStatus}</p>
         </div>
         <div className="col-3">
           <p
@@ -66,7 +52,7 @@ const VideoRecorder = () => {
             <button
               className="btn btn-primary btn-sm fw-bold"
               type="button"
-              onClick={() => startVideoRecording()}
+              onClick={() => startInterview()}
             >
               Start Recording
             </button>
@@ -95,7 +81,7 @@ const VideoRecorder = () => {
         <div className="col-12 d-flex align-items-center justify-content-center">
           {isStop && (
             <video
-              src={mediaBlobUrl}
+              src={screenBlobUrl}
               width={"100%"}
               height={500}
               controls
@@ -106,7 +92,7 @@ const VideoRecorder = () => {
             <VideoStreamPreview stream={previewStream} />
           )}
 
-          {!isRecording && !mediaBlobUrl && (
+          {!isRecording && !screenBlobUrl && (
             <div
               className="d-flex align-items-center justify-content-center"
               style={{ height: "50%", width: "100%", background: "#ccc" }}
