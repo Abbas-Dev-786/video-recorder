@@ -1,6 +1,12 @@
 import { memo, useEffect, useRef } from "react";
 
-const VideoStreamPreview = memo(function VideoStreamPreview({ stream }: any) {
+interface VideoStreamPreviewProps {
+  stream: MediaStream | null;
+}
+
+const VideoStreamPreview = memo(function VideoStreamPreview({
+  stream,
+}: VideoStreamPreviewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -14,8 +20,14 @@ const VideoStreamPreview = memo(function VideoStreamPreview({ stream }: any) {
   }
 
   return (
-    <div>
-      <video ref={videoRef} width={"100%"} height={500} autoPlay />
+    <div
+      style={{
+        position: "absolute",
+        bottom: "-1%",
+        right: "0%",
+      }}
+    >
+      <video ref={videoRef} width={"100%"} height={175} autoPlay />
     </div>
   );
 });

@@ -1,6 +1,7 @@
 import VideoStreamPreview from "./VideoStreamPreview";
 import { useContext, useEffect, useRef } from "react";
 import { MyContext } from "../store/GlobalContext";
+import InterviewScreen from "./InterviewScreen";
 
 const VideoRecorder = () => {
   const timerRef = useRef<HTMLParagraphElement | null>(null);
@@ -36,7 +37,7 @@ const VideoRecorder = () => {
   }, [timerRef, isRecording]);
 
   return (
-    <div className="container border p-3">
+    <div className="container border p-3 position-relative">
       <div className="row">
         <div className="col-4">
           <p className="text-capitalize fw-bolder">Status:- {screenStatus}</p>
@@ -54,27 +55,9 @@ const VideoRecorder = () => {
               type="button"
               onClick={() => startInterview()}
             >
-              Start Recording
+              Start Interview
             </button>
           )}
-          {/* {isRecording && (
-            <button
-              className="btn btn-secondary btn-sm fw-bold"
-              type="button"
-              onClick={() => pauseVideoRecording()}
-            >
-              {isPause ? "Continue" : "Pause"} Recording
-            </button>
-          )}
-          {isRecording && (
-            <button
-              className="btn btn-danger btn-sm fw-bold"
-              type="button"
-              onClick={() => endVideoRecording()}
-            >
-              Stop Recording
-            </button>
-          )} */}
         </div>
       </div>
       <div className="row mt-3">
@@ -88,6 +71,8 @@ const VideoRecorder = () => {
               autoPlay
             />
           )}
+          {previewStream && isRecording && <InterviewScreen />}
+
           {previewStream && isRecording && (
             <VideoStreamPreview stream={previewStream} />
           )}
@@ -95,11 +80,11 @@ const VideoRecorder = () => {
           {!isRecording && !screenBlobUrl && (
             <div
               className="d-flex align-items-center justify-content-center"
-              style={{ height: "50%", width: "100%", background: "#ccc" }}
+              style={{ height: "100%", width: "100%", background: "#ccc" }}
             >
-              <h3 className="text-center text-capitalize">
-                Start video recording
-              </h3>
+              <h4 className="text-center text-capitalize p-3">
+                Start Interview
+              </h4>
             </div>
           )}
         </div>

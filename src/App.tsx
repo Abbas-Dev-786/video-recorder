@@ -4,7 +4,7 @@ import disableDevtool from "disable-devtool";
 
 const App = () => {
   useEffect(() => {
-    // disableDevtool();
+    disableDevtool();
   }, []);
 
   return (

@@ -1,11 +1,17 @@
 import moment from "moment";
 import { useState } from "react";
 
+interface useVideoRecorderProps {
+  startRecording: () => void;
+  stopRecording: () => void;
+  pauseRecording: () => void;
+}
+
 const useVideoRecorder = ({
   startRecording,
   stopRecording,
   pauseRecording,
-}: any) => {
+}: useVideoRecorderProps) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isStop, setIsStop] = useState<boolean>(false);
   const [isPause, setIsPause] = useState<boolean>(false);

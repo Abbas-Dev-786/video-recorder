@@ -1,11 +1,5 @@
 import moment from "moment";
-import {
-  createContext,
-  PropsWithChildren,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { createContext, PropsWithChildren, useState } from "react";
 import { useReactMediaRecorder } from "react-media-recorder";
 
 interface MyContextType {
@@ -39,13 +33,6 @@ export const MyContext = createContext<MyContextType>({
 const GlobalContext = ({ children }: PropsWithChildren) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isStop, setIsStop] = useState<boolean>(false);
-  const [combinedStream, setCombinedStream] = useState<MediaStream | null>(
-    null
-  );
-  const [combinedBlobUrl, setCombinedBlobUrl] = useState<string | undefined>(
-    undefined
-  );
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const {
     status: screenStatus,
@@ -56,6 +43,7 @@ const GlobalContext = ({ children }: PropsWithChildren) => {
   } = useReactMediaRecorder({
     screen: true,
     askPermissionOnMount: true,
+    onStop: endInterview,
   });
 
   const { status, mediaBlobUrl, previewStream, startRecording, stopRecording } =
@@ -73,23 +61,15 @@ const GlobalContext = ({ children }: PropsWithChildren) => {
 
     const startTime = new Date();
     sessionStorage.setItem("startTime", startTime.toISOString());
-
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.start();
-    }
   };
 
-  const endInterview = () => {
+  function endInterview() {
     setIsStop(true);
     setIsRecording(false);
 
     stopRecording();
     stopScreenRecording();
-
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-    }
-  };
+  }
 
   const getTime = () => {
     const startTime = moment(
@@ -110,39 +90,14 @@ const GlobalContext = ({ children }: PropsWithChildren) => {
     ];
   };
 
-  useEffect(() => {
-    if (screenPreviewStream && previewStream) {
-      const stream = new MediaStream();
-      screenPreviewStream
-        .getTracks()
-        .forEach((track) => stream.addTrack(track));
-      previewStream.getTracks().forEach((track) => stream.addTrack(track));
-      setCombinedStream(stream);
-    }
-  }, [screenPreviewStream, previewStream]);
-
-  useEffect(() => {
-    if (combinedStream) {
-      const mediaRecorder = new MediaRecorder(combinedStream);
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          const videoBlob = new Blob([event.data], { type: "video/webm" });
-          setCombinedBlobUrl(URL.createObjectURL(videoBlob));
-        }
-      };
-    }
-  }, [combinedStream]);
-
   return (
     <MyContext.Provider
       value={{
         status,
-        mediaBlobUrl: combinedBlobUrl,
+        mediaBlobUrl,
         previewStream,
         screenStatus,
-        screenBlobUrl: combinedBlobUrl,
+        screenBlobUrl,
         screenPreviewStream,
         isRecording,
         isStop,
